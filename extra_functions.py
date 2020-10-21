@@ -3,6 +3,32 @@ import sys
 import os
 import datetime
 
+def find_value(x, y):
+    #x is the attribute of which value is to be found
+    #y is the array in which the value to be found
+    t = False
+    for val in y:
+        if t :
+            return val
+        if val == x:
+            t = True
+        return None
+
+
+def GetBodyContent(requested_path, content_type):     
+	if(content_type=="text/html") :
+		f= open(requested_path)
+		body=f.read()
+		body=body.encode() 
+		return body 
+				
+	else  :
+		f=open(requested_path, 'rb')
+		body=f.read()
+		return body
+
+
+
 
 def GetContentType(file_name):
     

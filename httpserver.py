@@ -8,7 +8,7 @@ from Requests import Process_GET_Request
 def ProcessClient(connectionSocket):
 
 
-	message=connectionSocket.recv(1024).decode()
+	message=connectionSocket.recv(20240).decode()
 	print(message)
 	ProcessRequest(connectionSocket , message )
 	
@@ -17,6 +17,7 @@ def ProcessClient(connectionSocket):
 def ProcessRequest(connectionSocket , message):
 
 	request=message.split()
+	
 	if request[0]=="GET" :
 		Process_GET_Request(connectionSocket , request )
 	if request[0]=="POST" :
@@ -24,7 +25,7 @@ def ProcessRequest(connectionSocket , message):
 	if request[0]=="PUT" :
 		Process_GET_Request(connectionSocket , request )
 	if request[0]=="DELETE" :
-		Process_GET_Request(connectionSocket , request )
+		Process_GET_Request(connectionSocket , request ) 
 	
 	
 
