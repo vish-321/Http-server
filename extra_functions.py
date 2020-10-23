@@ -3,7 +3,7 @@ import sys
 import os
 import datetime
 
-def find_value(x, y):
+def GetKeyValue(x, y):
     #x is the attribute of which value is to be found
     #y is the array in which the value to be found
     t = False

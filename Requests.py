@@ -3,54 +3,122 @@ import sys
 import os
 import datetime
 from extra_functions import * 
+from status_codes import *
 
 ROOT="test_website"
 
 def  Process_GET_Request(connectionSocket , request ) :
+	
+	if request[1]=="/" :
+		request[1]+="index.html"
+	requested_path=  ROOT + request[1]
+	if  request[1][0]!='/' :
+		status_400(connectionSocket,request)		#Bad Request 
+		
+	elif len(request[1])>2048 :
+		status_414(connectionSocket,request)		#URI too long
+		
+	elif request[1].find('?') !=-1:
+		payload= request[1][request[1].find('?')+1 :]
+		words= payload.split('&')
+		
+		if words[0]=="email=vishalbhatane123%40gmail.com" and words[1]=="pswd=1234" :
+			requested_path="test_website/homework.html"
+			status_200(requested_path , connectionSocket , request)
+		else :
+			status_403(connectionSocket , request)
+	
+		
+	elif os.path.exists(requested_path) :
+		if request[2]=="HTTP/1.1" :
+			status_200(requested_path, connectionSocket ,request) #called status_200 method froms status_codes		
+		elif request[2]=="HTTP/1.0" :
+			status_426(connectionSocket,request) 	# Upgrade  required
+				
+		elif request[2]=="HTTP/2.0" or request[2]=="HTTP/3.0" :
+			status_505(connectionSocket,request) 	# Htpp version not supported
+			
+				
+			
+		else :
+			status_400(connectionSocket,request)	#Bad request
+				
+				
+	else :
+		
+		if requested_path == "test_website/temp.html" :
+			status_302(connectionSocket,request)	# found but moved to another URI
+			
+		elif requested_path=="test_website/location.html" :
+			status_301(connectionSocket,request)	#moved permanantly
+		else  :
+			status_404 (connectionSocket ,request)	 #Not found
+			
+			
+			
+			
+			
 
-	if  (request[0]=="GET"):
+
+
+
+def  Process_HEAD_Request(connectionSocket , request ) :
+
+	if request[1]=="/" :
+		request[1]+="index.html"
+	requested_path=  ROOT + request[1]
+	if  request[1][0]!='/' :
+		status_400(connectionSocket,request)
+		
+	elif len(request[1])>2048 :
+		status_414(connectionSocket,request)		#URI too long
+		
+	elif request[1].find("?") !=-1:
+		payload= request[1][request[1].find("?")+1 :]
+		
+		words= payload.split('&')
+		
+		
+		if words[0]=="email=vishalbhatane123%40gmail.com" and words[1]=="pswd=1234" :
+			requested_path="test_website/homework.html"
+			status_200(requested_path , connectionSocket , request)
+		else :
+			
+			status_403(connectionSocket , request)		# Acess Forbidden 
 	
 		
 		
-		if request[1]=="/" :
-			request[1]+="index.html"
-		requested_path=  ROOT + request[1]
+	elif os.path.exists(requested_path) :
+		if request[2]=="HTTP/1.1" :
+			status_200(requested_path, connectionSocket ,request) #called status_200 method froms status_codes		
+		elif request[2]=="HTTP/1.0" :
+			status_426(connectionSocket,request) 	# Upgrade  required
+				
+		elif request[2]=="HTTP/2.0" or request[2]=="HTTP/3.0" :
+			status_505(connectionSocket,request) 	# Htpp version not supported
+			
+				
+			
+		else :
+			status_400(connectionSocket,request)	#Bad request
+				
+				
+	else :
 		
-		
-		if os.path.exists(requested_path) :
-		
-			response ="HTTP/1.1 200 OK\r\n"
-			curr_time = datetime.datetime.now()
-			response+= ("Date: " + curr_time.strftime("%A") + ", "+ curr_time.strftime("%d") + " " +  curr_time.strftime("%b") + " " + curr_time.strftime("%Y") + " " + curr_time.strftime("%X") + " GMT\r\n")
-			response+="Server: Vishal-Server\r\n"
-			last_modified = os.path.getmtime(requested_path)
-			response += ("Last-Modified: " + datetime.datetime.fromtimestamp(last_modified).strftime("%A, %d %b, %Y %I:%M:%S")+ " GMT\r\n")
-			response += 'ETag: "6d82cbb050ddc7fa9cbb659014546e59"\r\n'
-			response += "Accept-Ranges: bytes\r\n"
+		if requested_path == "test_website/temp.html" :
+			status_302(connectionSocket,request)	# found but moved to another URI
 			
-			if find_value("Connection:", request) != "keep-alive":
-				response+="Connection: Keep-Alive\r\n"
-				response+="Keep-Alive: timeout=5, max=1000\r\n"
-			else :
-				response+="Connection: close\r\n"
-			content_size= os.path.getsize(requested_path)
-			
-			response+="Content-Length: "+str (content_size) + "\r\n"
-		
-			content_type = GetContentType(request[1])
-			response+="Content-Type: "+content_type+ "\r\n\r\n"
-			print(response)
-			response=response.encode()
-			
-			response+= GetBodyContent(requested_path, content_type) #GetBodyContent implemented in extra_functions
-			connectionSocket.send(response)
-			if find_value("Connection:", request) != "keep-alive":
-				connectionSocket.close()
+		elif requested_path=="test_website/location.html" :
+			status_301(connectionSocket,request)	#moved permanantly
+		else  :
+			status_404 (connectionSocket ,request)	 #not found
 			
 			
-			
-			
-			
-			
-			
+
+
+
+
+
+
+
 			

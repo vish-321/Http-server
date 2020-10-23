@@ -3,13 +3,19 @@ from socket import *
 import sys
 from threading import Thread
 from Requests import Process_GET_Request
+from status_codes import status_501,status_503
 
+client_count=0;
 
 def ProcessClient(connectionSocket):
-
-
-	message=connectionSocket.recv(20240).decode()
+	global client_count
+	client_count+=1
+	
+	message=connectionSocket.recv(10240).decode()
 	print(message)
+	
+		
+	
 	ProcessRequest(connectionSocket , message )
 	
 	return 
@@ -17,17 +23,24 @@ def ProcessClient(connectionSocket):
 def ProcessRequest(connectionSocket , message):
 
 	request=message.split()
-	
+	global client_count
+	if client_count >100:
+		status_503( connectionSocket,request)		# Service unavailable due to overload
+		
 	if request[0]=="GET" :
 		Process_GET_Request(connectionSocket , request )
-	if request[0]=="POST" :
+	elif request[0]=="POST" :
 		Process_POST_Request(connectionSocket , request )
-	if request[0]=="PUT" :
+	elif request[0]=="PUT" :
 		Process_GET_Request(connectionSocket , request )
-	if request[0]=="DELETE" :
+	elif request[0]=="DELETE" :
 		Process_GET_Request(connectionSocket , request ) 
+	elif request[0]=="HEAD" :
+		Process_GET_Request(connectionSocket , request ) 
+	else :
+		status_501(connectionSocket)
 	
-	
+	client_count-=1
 
 		
 		
