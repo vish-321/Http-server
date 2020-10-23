@@ -6,13 +6,9 @@ import datetime
 def GetKeyValue(x, y):
     #x is the attribute of which value is to be found
     #y is the array in which the value to be found
-    t = False
-    for val in y:
-        if t :
-            return val
-        if val == x:
-            t = True
-        return None
+    if x in y :
+    	return y[y.index(x)+1]
+    
 
 
 def GetBodyContent(requested_path, content_type):     

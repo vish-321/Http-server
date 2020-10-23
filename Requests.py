@@ -31,7 +31,14 @@ def  Process_GET_Request(connectionSocket , request ) :
 		
 	elif os.path.exists(requested_path) :
 		if request[2]=="HTTP/1.1" :
-			status_200(requested_path, connectionSocket ,request) #called status_200 method froms status_codes		
+			
+			if GetKeyValue("If-Range:", request)=='"6d82cbb050ddc7fa9cbb659014546e59"':
+				status_304(requested_path,connectionSocket ,request)
+				
+			elif GetKeyValue("If-None-Match:", request)=='"6d82cbb050ddc7fa9cbb659014546e59"':
+				status_304(requested_path,connectionSocket ,request)	
+			else :
+				status_200(requested_path, connectionSocket ,request) #called status_200 method froms status_codes		
 		elif request[2]=="HTTP/1.0" :
 			status_426(connectionSocket,request) 	# Upgrade  required
 				
@@ -52,7 +59,7 @@ def  Process_GET_Request(connectionSocket , request ) :
 		elif requested_path=="test_website/location.html" :
 			status_301(connectionSocket,request)	#moved permanantly
 		else  :
-			status_404 (connectionSocket ,request)	 #Not found
+			status_404 (connectionSocket ,request)	 #Not foun
 			
 			
 			
@@ -90,7 +97,14 @@ def  Process_HEAD_Request(connectionSocket , request ) :
 		
 	elif os.path.exists(requested_path) :
 		if request[2]=="HTTP/1.1" :
-			status_200(requested_path, connectionSocket ,request) #called status_200 method froms status_codes		
+			if GetKeyValue("If-Range:", request)=='"6d82cbb050ddc7fa9cbb659014546e59"':
+				status_304(requested_path,connectionSocket ,request)
+				
+			elif GetKeyValue("If-None-Match:", request)=='"6d82cbb050ddc7fa9cbb659014546e59"':
+				status_304(requested_path,connectionSocket ,request)	
+			else :
+				status_200(requested_path, connectionSocket ,request) #called status_200 method froms status_codes		
+				
 		elif request[2]=="HTTP/1.0" :
 			status_426(connectionSocket,request) 	# Upgrade  required
 				

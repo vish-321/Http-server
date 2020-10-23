@@ -22,15 +22,16 @@ def status_200 (requested_path, connectionSocket ,request):
 	response += 'ETag: "6d82cbb050ddc7fa9cbb659014546e59"\r\n'
 	response += "Accept-Ranges: bytes\r\n"
 			
-	if GetKeyValue("Connection:", request) != "keep-alive":
+	if GetKeyValue("Connection:", request) == "close":
+		response+="Connection: close\r\n"
+	else :
 		response+="Connection: Keep-Alive\r\n"
 		response+="Keep-Alive: timeout=5, max=1000\r\n"
-	else :
-		response+="Connection: close\r\n"
+		
 		
 	if request[0]=="HEAD" :
 		connectionSocket.send(response.encode())
-		if GetKeyValue("Connection:", request) != "keep-alive":
+		if GetKeyValue("Connection:", request) == "close":
 			connectionSocket.close()
 		
 	else:
@@ -45,7 +46,7 @@ def status_200 (requested_path, connectionSocket ,request):
 				
 		response+= GetBodyContent(requested_path, content_type) #GetBodyContent implemented in extra_functions
 		connectionSocket.send(response)
-		if GetKeyValue("Connection:", request) != "keep-alive":
+		if GetKeyValue("Connection:", request) == "close":
 			connectionSocket.close()
 			
 			
@@ -638,13 +639,59 @@ def status_302 ( connectionSocket ,request ):
 			
 	response+= GetBodyContent(requested_path, "text/html") #GetBodyContent implemented in extra_functions
 	connectionSocket.send(response)
-	if GetKeyValue("Connection:", request) != "keep-alive":
+	if GetKeyValue("Connection:", request) == "close":
 		connectionSocket.close()
 		
 		
 
 
+def status_304 ( requested_path,connectionSocket ,request ):
+	response ="HTTP/1.1 304 Not Modified\r\n"
+	curr_time = datetime.datetime.now()
+	response+= ("Date: " + curr_time.strftime("%A") + ", "+ curr_time.strftime("%d") + " " +  curr_time.strftime("%b") + " " + curr_time.strftime("%Y") + " " + curr_time.strftime("%X") + " GMT\r\n")
+	response+="Server: Vishal-Server\r\n"
 	
+	
+	last_modified = os.path.getmtime(requested_path)
+	response += ("Last-Modified: " + datetime.datetime.fromtimestamp(last_modified).strftime("%A, %d %b, %Y %I:%M:%S")+ " GMT\r\n")
+	response += 'ETag: "6d82cbb050ddc7fa9cbb659014546e59"\r\n'
+	response += "Accept-Ranges: bytes\r\n"
+				
+	if GetKeyValue("Connection:", request) == "close":
+		response+="Connection: close\r\n"
+		
+	else :
+		response+="Connection: Keep-Alive\r\n"
+		response+="Keep-Alive: timeout=5, max=1000\r\n"
+	
+	
+	if request[0]=="HEAD" :
+		connectionSocket.send(response.encode())
+		if GetKeyValue("Connection:", request) == "close":
+			connectionSocket.close()
+		
+	else:
+		content_size= os.path.getsize(requested_path)
+				
+		response+="Content-Length: "+str (content_size) + "\r\n"
+			
+		content_type = GetContentType(request[1])
+		response+="Content-Type: "+content_type+ "\r\n\r\n"
+		print(response)
+		response=response.encode()
+				
+		response+= GetBodyContent(requested_path, content_type) #GetBodyContent implemented in extra_functions
+		connectionSocket.send(response)
+		if GetKeyValue("Connection:", request) == "close":
+			connectionSocket.close()
+			
+			
+
+
+
+
+
+		
 	
 
 
