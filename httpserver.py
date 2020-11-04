@@ -23,6 +23,7 @@ def ProcessClient(connectionSocket):
 def ProcessRequest(connectionSocket , message):
 
 	request=message.split()
+	print(message)
 	global client_count
 	if client_count >100:
 		status_503( connectionSocket,request)		# Service unavailable due to overload
@@ -30,13 +31,13 @@ def ProcessRequest(connectionSocket , message):
 	if request[0]=="GET" :
 		Process_GET_Request(connectionSocket , request )
 	elif request[0]=="POST" :
-		Process_POST_Request(connectionSocket , request )
+		Process_POST_Request(connectionSocket , request ,message)
 	elif request[0]=="PUT" :
-		Process_GET_Request(connectionSocket , request )
+		Process_PUT_Request(connectionSocket , request ,message )
 	elif request[0]=="DELETE" :
-		Process_GET_Request(connectionSocket , request ) 
+		Process_DELETE_Request(connectionSocket , request ,message ) 
 	elif request[0]=="HEAD" :
-		Process_GET_Request(connectionSocket , request ) 
+		Process_HEAD_Request(connectionSocket , request ) 
 	else :
 		status_501(connectionSocket)
 	
@@ -61,23 +62,6 @@ while True:
 	th= Thread(target=ProcessClient,args=(connectionSocket,))
 	th.start()
 	
-	
-	
-	
-	
-	
-		
-	
-	
-
-
-
-
-
-
-
-
-
 
 
 

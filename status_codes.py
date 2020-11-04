@@ -29,12 +29,16 @@ def status_200 (requested_path, connectionSocket ,request):
 		response+="Keep-Alive: timeout=5, max=1000\r\n"
 		
 		
-	if request[0]=="HEAD" :
+	if request[0]=="HEAD" or  request[0]=="POST"  or request[0]=="PUT":
 		connectionSocket.send(response.encode())
 		if GetKeyValue("Connection:", request) == "close":
 			connectionSocket.close()
+			
+	
 		
 	else:
+		if request[0]== "DELETE" :
+			requested_path="errors/delete.html"
 		content_size= os.path.getsize(requested_path)
 				
 		response+="Content-Length: "+str (content_size) + "\r\n"
@@ -43,7 +47,7 @@ def status_200 (requested_path, connectionSocket ,request):
 		response+="Content-Type: "+content_type+ "\r\n\r\n"
 		print(response)
 		response=response.encode()
-				
+			
 		response+= GetBodyContent(requested_path, content_type) #GetBodyContent implemented in extra_functions
 		connectionSocket.send(response)
 		if GetKeyValue("Connection:", request) == "close":
@@ -51,10 +55,71 @@ def status_200 (requested_path, connectionSocket ,request):
 			
 			
 
+def status_201 ( connectionSocket ,request):
+	response ="HTTP/1.1 201 Created\r\n"
+	response+="Location: log.txt\r\n"
+	curr_time = datetime.datetime.now()
+	response+= ("Date: " + curr_time.strftime("%A") + ", "+ curr_time.strftime("%d") + " " +  curr_time.strftime("%b") + " " + curr_time.strftime("%Y") + " " + curr_time.strftime("%X") + " GMT\r\n")
+	response+="Server: Vishal-Server\r\n"
+	
+	response += 'ETag: "6d82cbb050ddc7fa9cbb659014546e59"\r\n'
+	response += "Accept-Ranges: bytes\r\n"
+			
+	if GetKeyValue("Connection:", request) == "close":
+		response+="Connection: close\r\n"
+	else :
+		response+="Connection: Keep-Alive\r\n"
+		response+="Keep-Alive: timeout=5, max=1000\r\n"
+	connectionSocket.send(response.encode())
+	if GetKeyValue("Connection:", request) == "close":
+		connectionSocket.close()
+			
+			
+def status_202 ( connectionSocket ,request):
+	response ="HTTP/1.1 202 Accepted\r\n"
+	curr_time = datetime.datetime.now()
+	response+= ("Date: " + curr_time.strftime("%A") + ", "+ curr_time.strftime("%d") + " " +  curr_time.strftime("%b") + " " + curr_time.strftime("%Y") + " " + curr_time.strftime("%X") + " GMT\r\n")
+	response+="Server: Vishal-Server\r\n"
+	
+	response += 'ETag: "6d82cbb050ddc7fa9cbb659014546e59"\r\n'
+	response += "Accept-Ranges: bytes\r\n"
+			
+	if GetKeyValue("Connection:", request) == "close":
+		response+="Connection: close\r\n"
+	else :
+		response+="Connection: Keep-Alive\r\n"
+		response+="Keep-Alive: timeout=5, max=1000\r\n"
+		
+		
+	connectionSocket.send(response.encode())
+	if GetKeyValue("Connection:", request) == "close":
+		connectionSocket.close()
+			
+			
 
 
-
-
+def status_204 ( connectionSocket ,request):
+	response ="HTTP/1.1 204 No Content\r\n"
+	response+="Location: log.txt\r\n"
+	curr_time = datetime.datetime.now()
+	response+= ("Date: " + curr_time.strftime("%A") + ", "+ curr_time.strftime("%d") + " " +  curr_time.strftime("%b") + " " + curr_time.strftime("%Y") + " " + curr_time.strftime("%X") + " GMT\r\n")
+	response+="Server: Vishal-Server\r\n"
+	
+	response += 'ETag: "6d82cbb050ddc7fa9cbb659014546e59"\r\n'
+	response += "Accept-Ranges: bytes\r\n"
+			
+	if GetKeyValue("Connection:", request) == "close":
+		response+="Connection: close\r\n"
+	else :
+		response+="Connection: Keep-Alive\r\n"
+		response+="Keep-Alive: timeout=5, max=1000\r\n"
+		
+		
+	connectionSocket.send(response.encode())
+	if GetKeyValue("Connection:", request) == "close":
+		connectionSocket.close()
+			
+			
 
 
 
@@ -66,11 +131,12 @@ def status_400 ( connectionSocket ,request):
 	response+= ("Date: " + curr_time.strftime("%A") + ", "+ curr_time.strftime("%d") + " " +  curr_time.strftime("%b") + " " + curr_time.strftime("%Y") + " " + curr_time.strftime("%X") + " GMT\r\n")
 	response+="Server: Vishal-Server\r\n"
 			
-	if GetKeyValue("Connection:", request) != "keep-alive":
+	if GetKeyValue("Connection:", request) == "close":
+		response+="Connection: close\r\n"
+	else :
 		response+="Connection: Keep-Alive\r\n"
 		response+="Keep-Alive: timeout=5, max=1000\r\n"
-	else :
-		response+="Connection: close\r\n"
+		
 	
 	requested_path="errors/error_400.html"
 	content_size= os.path.getsize(requested_path)
@@ -83,7 +149,7 @@ def status_400 ( connectionSocket ,request):
 			
 	response+= GetBodyContent(requested_path, "text/html") #GetBodyContent implemented in extra_functions
 	connectionSocket.send(response)
-	if GetKeyValue("Connection:", request) != "keep-alive":
+	if GetKeyValue("Connection:", request) == "close":
 		connectionSocket.close()
 		
 		
@@ -95,11 +161,12 @@ def status_404 ( connectionSocket ,request):
 	response+= ("Date: " + curr_time.strftime("%A") + ", "+ curr_time.strftime("%d") + " " +  curr_time.strftime("%b") + " " + curr_time.strftime("%Y") + " " + curr_time.strftime("%X") + " GMT\r\n")
 	response+="Server: Vishal-Server\r\n"
 			
-	if GetKeyValue("Connection:", request) != "keep-alive":
+	if GetKeyValue("Connection:", request) == "close":
+		response+="Connection: close\r\n"
+	else :
 		response+="Connection: Keep-Alive\r\n"
 		response+="Keep-Alive: timeout=5, max=1000\r\n"
-	else :
-		response+="Connection: close\r\n"
+		
 		
 	if request[0]=="HEAD" :
 		connectionSocket.send(response.encode())
@@ -118,7 +185,7 @@ def status_404 ( connectionSocket ,request):
 			
 	response+= GetBodyContent(requested_path, "text/html") #GetBodyContent implemented in extra_functions
 	connectionSocket.send(response)
-	if GetKeyValue("Connection:", request) != "keep-alive":
+	if GetKeyValue("Connection:", request) == "close":
 		connectionSocket.close()
 		
 	
@@ -139,11 +206,12 @@ def status_403 ( connectionSocket ,request):
 	response+= ("Date: " + curr_time.strftime("%A") + ", "+ curr_time.strftime("%d") + " " +  curr_time.strftime("%b") + " " + curr_time.strftime("%Y") + " " + curr_time.strftime("%X") + " GMT\r\n")
 	response+="Server: Vishal-Server\r\n"
 			
-	if GetKeyValue("Connection:", request) != "keep-alive":
+	if GetKeyValue("Connection:", request) == "close":
+		response+="Connection: close\r\n"
+	else :
 		response+="Connection: Keep-Alive\r\n"
 		response+="Keep-Alive: timeout=5, max=1000\r\n"
-	else :
-		response+="Connection: close\r\n"
+		
 		
 	if request[0]=="HEAD" :
 		connectionSocket.send(response.encode())
@@ -162,7 +230,7 @@ def status_403 ( connectionSocket ,request):
 			
 	response+= GetBodyContent(requested_path, "text/html") #GetBodyContent implemented in extra_functions
 	connectionSocket.send(response)
-	if GetKeyValue("Connection:", request) != "keep-alive":
+	if GetKeyValue("Connection:", request) == "close":
 		connectionSocket.close()
 		
 			
@@ -215,12 +283,12 @@ def status_411 ( connectionSocket ,request):
 	response+= ("Date: " + curr_time.strftime("%A") + ", "+ curr_time.strftime("%d") + " " +  curr_time.strftime("%b") + " " + curr_time.strftime("%Y") + " " + curr_time.strftime("%X") + " GMT\r\n")
 	response+="Server: Vishal-Server\r\n"
 			
-	if GetKeyValue("Connection:", request) != "keep-alive":
+	if GetKeyValue("Connection:", request) == "close":
+		response+="Connection: close\r\n"
+	else :
 		response+="Connection: Keep-Alive\r\n"
 		response+="Keep-Alive: timeout=5, max=1000\r\n"
-	else :
-		response+="Connection: close\r\n"
-	
+		
 	if request[0]=="HEAD" :
 		connectionSocket.send(response.encode())
 		if GetKeyValue("Connection:", request) != "keep-alive":
@@ -237,7 +305,7 @@ def status_411 ( connectionSocket ,request):
 			
 	response+= GetBodyContent(requested_path, "text/html") #GetBodyContent implemented in extra_functions
 	connectionSocket.send(response)
-	if GetKeyValue("Connection:", request) != "keep-alive":
+	if GetKeyValue("Connection:", request) == "close":
 		connectionSocket.close()
 		
 	
@@ -254,12 +322,12 @@ def status_413 ( connectionSocket ,request):
 	response+= ("Date: " + curr_time.strftime("%A") + ", "+ curr_time.strftime("%d") + " " +  curr_time.strftime("%b") + " " + curr_time.strftime("%Y") + " " + curr_time.strftime("%X") + " GMT\r\n")
 	response+="Server: Vishal-Server\r\n"
 			
-	if GetKeyValue("Connection:", request) != "keep-alive":
+	if GetKeyValue("Connection:", request) == "close":
+		response+="Connection: close\r\n"
+	else :
 		response+="Connection: Keep-Alive\r\n"
 		response+="Keep-Alive: timeout=5, max=1000\r\n"
-	else :
-		response+="Connection: close\r\n"
-	
+		
 	requested_path="errors/error_413.html"
 	content_size= os.path.getsize(requested_path)
 			
@@ -271,7 +339,7 @@ def status_413 ( connectionSocket ,request):
 			
 	response+= GetBodyContent(requested_path, "text/html") #GetBodyContent implemented in extra_functions
 	connectionSocket.send(response)
-	if GetKeyValue("Connection:", request) != "keep-alive":
+	if GetKeyValue("Connection:", request) == "close":
 		connectionSocket.close()
 		
 	
@@ -286,12 +354,12 @@ def status_414 ( connectionSocket ,request):
 	response+= ("Date: " + curr_time.strftime("%A") + ", "+ curr_time.strftime("%d") + " " +  curr_time.strftime("%b") + " " + curr_time.strftime("%Y") + " " + curr_time.strftime("%X") + " GMT\r\n")
 	response+="Server: Vishal-Server\r\n"
 			
-	if GetKeyValue("Connection:", request) != "keep-alive":
+	if GetKeyValue("Connection:", request) == "close":
+		response+="Connection: close\r\n"
+	else :
 		response+="Connection: Keep-Alive\r\n"
 		response+="Keep-Alive: timeout=5, max=1000\r\n"
-	else :
-		response+="Connection: close\r\n"
-	
+		
 	if request[0]=="HEAD" :
 		connectionSocket.send(response.encode())
 		if GetKeyValue("Connection:", request) != "keep-alive":
@@ -308,7 +376,7 @@ def status_414 ( connectionSocket ,request):
 			
 	response+= GetBodyContent(requested_path, "text/html") #GetBodyContent implemented in extra_functions
 	connectionSocket.send(response)
-	if GetKeyValue("Connection:", request) != "keep-alive":
+	if GetKeyValue("Connection:", request) == "close":
 		connectionSocket.close()
 		
 	
@@ -330,8 +398,8 @@ def status_426 ( connectionSocket ,request ):
 	
 	if request[0]=="HEAD" :
 		connectionSocket.send(response.encode())
-		if GetKeyValue("Connection:", request) != "keep-alive":
-			connectionSocket.close()
+		
+		connectionSocket.close()
 		return
 	
 	requested_path="errors/error_426.html"
@@ -365,8 +433,8 @@ def status_500 ( connectionSocket ,request):
 	
 	if request[0]=="HEAD" :
 		connectionSocket.send(response.encode())
-		if GetKeyValue("Connection:", request) != "keep-alive":
-			connectionSocket.close()
+		
+		connectionSocket.close()
 		return
 	
 	
@@ -403,11 +471,12 @@ def status_501 ( connectionSocket ,request):
 	
 	response+="Allow: GET,HEAD,POST,PUT,DELETE\r\n"
 			
-	if GetKeyValue("Connection:", request) != "keep-alive":
+	if GetKeyValue("Connection:", request) == "close":
+		response+="Connection: close\r\n"
+	else :
 		response+="Connection: Keep-Alive\r\n"
 		response+="Keep-Alive: timeout=5, max=1000\r\n"
-	else :
-		response+="Connection: close\r\n"
+		
 	
 	requested_path="errors/error_501.html"
 	content_size= os.path.getsize(requested_path)
@@ -420,7 +489,7 @@ def status_501 ( connectionSocket ,request):
 			
 	response+= GetBodyContent(requested_path, "text/html") #GetBodyContent implemented in extra_functions
 	connectionSocket.send(response)
-	if GetKeyValue("Connection:", request) != "keep-alive":
+	if GetKeyValue("Connection:", request) == "close":
 		connectionSocket.close()
 		
 		
@@ -434,14 +503,12 @@ def status_502 ( connectionSocket ,request):
 	response+= ("Date: " + curr_time.strftime("%A") + ", "+ curr_time.strftime("%d") + " " +  curr_time.strftime("%b") + " " + curr_time.strftime("%Y") + " " + curr_time.strftime("%X") + " GMT\r\n")
 	response+="Server: Vishal-Server\r\n"
 	
-	
-	
-			
-	if GetKeyValue("Connection:", request) != "keep-alive":
+	if GetKeyValue("Connection:", request) == "close":
+		response+="Connection: close\r\n"
+	else :
 		response+="Connection: Keep-Alive\r\n"
 		response+="Keep-Alive: timeout=5, max=1000\r\n"
-	else :
-		response+="Connection: close\r\n"
+		
 	
 	if request[0]=="HEAD" :
 		connectionSocket.send(response.encode())
@@ -460,7 +527,7 @@ def status_502 ( connectionSocket ,request):
 			
 	response+= GetBodyContent(requested_path, "text/html") #GetBodyContent implemented in extra_functions
 	connectionSocket.send(response)
-	if GetKeyValue("Connection:", request) != "keep-alive":
+	if GetKeyValue("Connection:", request) == "close":
 		connectionSocket.close()
 		
 		
@@ -483,8 +550,8 @@ def status_503 ( connectionSocket ,request):
 	
 	if request[0]=="HEAD" :
 		connectionSocket.send(response.encode())
-		if GetKeyValue("Connection:", request) != "keep-alive":
-			connectionSocket.close()
+		
+		connectionSocket.close()
 		return
 	
 	requested_path="errors/error_503.html"
@@ -514,8 +581,8 @@ def status_504 ( connectionSocket ,request):
 	
 	if request[0]=="HEAD" :
 		connectionSocket.send(response.encode())
-		if GetKeyValue("Connection:", request) != "keep-alive":
-			connectionSocket.close()
+		
+		connectionSocket.close()
 		return
 	
 	requested_path="errors/error_504.html"
@@ -548,8 +615,8 @@ def status_505 ( connectionSocket ,request):
 	
 	if request[0]=="HEAD" :
 		connectionSocket.send(response.encode())
-		if GetKeyValue("Connection:", request) != "keep-alive":
-			connectionSocket.close()
+		
+		connectionSocket.close()
 		return
 	
 	requested_path="errors/error_505.html"
@@ -580,16 +647,16 @@ def status_301 ( connectionSocket ,request):
 	response+= ("Date: " + curr_time.strftime("%A") + ", "+ curr_time.strftime("%d") + " " +  curr_time.strftime("%b") + " " + curr_time.strftime("%Y") + " " + curr_time.strftime("%X") + " GMT\r\n")
 	response+="Server: Vishal-Server\r\n"
 		
-	if GetKeyValue("Connection:", request) != "keep-alive":
+	if GetKeyValue("Connection:", request) == "close":
+		response+="Connection: close\r\n"
+	else :
 		response+="Connection: Keep-Alive\r\n"
 		response+="Keep-Alive: timeout=5, max=1000\r\n"
-	else :
-		response+="Connection: close\r\n"
 		
 	response+="location: /backend/location.html\r\n"
 	if request[0]=="HEAD" :
 		connectionSocket.send(response.encode())
-		if GetKeyValue("Connection:", request) != "keep-alive":
+		if GetKeyValue("Connection:", request) == "close":
 			connectionSocket.close()
 		return
 	
@@ -604,7 +671,7 @@ def status_301 ( connectionSocket ,request):
 			
 	response+= GetBodyContent(requested_path, "text/html") #GetBodyContent implemented in extra_functions
 	connectionSocket.send(response)
-	if GetKeyValue("Connection:", request) != "keep-alive":
+	if GetKeyValue("Connection:", request) == "close":
 		connectionSocket.close()
 		
 		
@@ -614,16 +681,16 @@ def status_302 ( connectionSocket ,request ):
 	response+= ("Date: " + curr_time.strftime("%A") + ", "+ curr_time.strftime("%d") + " " +  curr_time.strftime("%b") + " " + curr_time.strftime("%Y") + " " + curr_time.strftime("%X") + " GMT\r\n")
 	response+="Server: Vishal-Server\r\n"
 		
-	if GetKeyValue("Connection:", request) != "keep-alive":
+	if GetKeyValue("Connection:", request) == "close":
+		response+="Connection: close\r\n"
+	else :
 		response+="Connection: Keep-Alive\r\n"
 		response+="Keep-Alive: timeout=5, max=1000\r\n"
-	else :
-		response+="Connection: close\r\n"
-	
+		
 	response+="location: /backend/temp.html\r\n"
 	if request[0]=="HEAD" :
 		connectionSocket.send(response.encode())
-		if GetKeyValue("Connection:", request) != "keep-alive":
+		if GetKeyValue("Connection:", request) == "close":
 			connectionSocket.close()
 		return
 		

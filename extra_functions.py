@@ -3,6 +3,16 @@ import sys
 import os
 import datetime
 
+
+def  write_in_log_file (message) :
+
+	fi = open("/test_website/log.text", "a")  #append mode
+	fi.write("\n")
+	message= message.split('\n\n') 
+	data=message[1]
+	fi.write(data)
+	fi.close()
+
 def GetKeyValue(x, y):
     #x is the attribute of which value is to be found
     #y is the array in which the value to be found
