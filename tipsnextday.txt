@@ -1,3 +1,0 @@
-# see format of not modified 304
-# there's error in GetKeyValue () , by default connection is persitent change that thing for all
-# otherwise you are done for get and head
